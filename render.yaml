@@ -1,0 +1,22 @@
+services:
+  # 1. FastAPI Backend Service
+  - type: web
+    name: endorisk-api
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.app:app --host 0.0.0.0 --port $PORT
+    plan: free
+
+  # 2. Streamlit Clinical Frontend Service
+  - type: web
+    name: endorisk-frontend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: streamlit run frontend/streamlit_app.py --server.port $PORT --server.address 0.0.0.0
+    plan: free
+    envVars:
+      - key: API_URL
+        fromService:
+          type: web
+          name: endorisk-api
+          property: host
